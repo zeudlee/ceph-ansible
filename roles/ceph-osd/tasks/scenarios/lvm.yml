@@ -1,12 +1,45 @@
 ---
+# create workflow tasks
 - name: use ceph-volume to create filestore osds with dedicated journals
   command: "ceph-volume lvm create --filestore --data {{ item.data_vg }}/{{ item.data }} --journal {{ item.journal }}"
   with_items: "{{ lvm_volumes }}"
   when:
     - item.journal_vg is not defined
+    - not item.only_prepare|default(false)
+    - not item.only_activate|default(false)
 
 - name: use ceph-volume to create filestore osds with dedicated lv journals
   command: "ceph-volume lvm create --filestore --data {{ item.data_vg }}/{{ item.data }} --journal {{item.journal_vg }}/{{ item.journal }}"
   with_items: "{{ lvm_volumes }}"
   when:
     - item.journal_vg is defined
+    - not item.only_prepare|default(false)
+    - not item.only_activate|default(false)
+
+# prepare only tasks
+- name: use ceph-volume to prepare filestore osds with dedicated lv journals
+  command: "ceph-volume lvm prepare --filestore --data {{ item.data_vg }}/{{ item.data }} --journal {{item.journal_vg }}/{{ item.journal }}"
+  with_items: "{{ lvm_volumes }}"
+  when:
+    - item.journal_vg is defined
+    - item.only_prepare|default(false)
+    - not item.only_activate|default(false)
+
+- name: use ceph-volume to prepare filestore osds with dedicated journals
+  command: "ceph-volume lvm prepare --filestore --data {{ item.data_vg }}/{{ item.data }} --journal {{ item.journal }}"
+  with_items: "{{ lvm_volumes }}"
+  when:
+    - item.journal_vg is not defined
+    - item.only_prepare|default(false)
+    - not item.only_activate|default(false)
+
+# activate only tasks
+#
+# TODO: use ceph-volume list to get the osd-id and osd-uuid
+#
+- name: use ceph-volume to activate filestore osds
+  command: "ceph-volume lvm activate --osd-id $osd_id --osd-uuid $osd_uuid"
+  with_items: "{{ lvm_volumes }}"
+  when:
+    - item.only_prepare|default(false)
+    - not item.only_activate|default(false)
