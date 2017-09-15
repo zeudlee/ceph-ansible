@@ -11,3 +11,8 @@
 
 - name: include enable_multimds.yml
   include: enable_multimds.yml
+
+- name: include debug_docker_mds.yml
+  include: debug_docker_mds.yml
+  when:
+    - mds_container_health.rc != 0

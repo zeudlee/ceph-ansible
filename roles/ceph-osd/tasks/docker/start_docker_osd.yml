@@ -28,19 +28,32 @@
     group: "root"
     mode: "0644"
 
-- name: enable systemd unit file for osd instance
-  shell: systemctl enable ceph-osd@{{ item | basename }}.service
-  changed_when: false
-  with_items: "{{ devices }}"
-
-- name: reload systemd unit files
-  shell: systemctl daemon-reload
-  changed_when: false
-
 - name: systemd start osd container
-  service:
+  systemd:
     name: ceph-osd@{{ item | basename }}
     state: started
     enabled: yes
-  changed_when: false
+    daemon_reload: yes
   with_items: "{{ devices }}"
+
+- name: get ceph osd container id
+  command: "docker ps -q --filter='name=ceph-osd-{{ ansible_hostname }}-dev{{ devices | first | regex_replace('/dev/', '') }}'"
+  changed_when: false
+  register: ceph_osd_container_id
+
+- name: set_fact osd_container_health rc
+  set_fact:
+    osd_container_health:
+      rc: 1
+  when: ceph_osd_container_id.stdout|length == '0'
+
+- name: make sure ceph osd container stays alive
+  shell: |
+    first_id="{{ ceph_osd_container_id }}"
+    id=$(docker ps -q --filter='name=ceph-osd-{{ ansible_hostname }}-dev{{ devices | first | regex_replace('/dev/', '') }}')
+    ! timeout 30 bash -c "while [[ $first_id == $id ]]; do continue ; done"
+  changed_when: false
+  failed_when: false
+  register: osd_container_health
+  when:
+    - ceph_osd_container_id.stdout|length != '0'
