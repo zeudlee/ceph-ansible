@@ -1,6 +1,6 @@
 ---
 - name: update period
-  command: radosgw-admin period update --commit
+  command: radosgw-admin --cluster={{ cluster }} period update --commit
 
 - name: restart rgw
   service:

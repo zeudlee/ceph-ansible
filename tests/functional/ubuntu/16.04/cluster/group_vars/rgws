@@ -6,3 +6,13 @@ create_pools:
     pg_num: 19
 rgw_override_bucket_index_max_shards: 16
 rgw_bucket_default_quota_max_objects: 1638400
+
+rgw_multisite: true
+rgw_zone: zone1
+rgw_zonemaster: true
+rgw_zonesecondary: false
+rgw_zonegroup: zg1
+rgw_zone_user: zone.user
+rgw_realm: r1
+system_access_key: 6kWkikvapSnHyE22P7nO
+system_secret_key: MGecsMrWtKZgngOHZdrd6d3JxGO5CPWgT2lcnpSt
