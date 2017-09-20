@@ -45,6 +45,7 @@
       delegate_to: "{{ item }}"
       delegate_facts: True
       with_items: "{{ groups['all'] }}"
+      when: hostvars[item]['ansible_hostname'] is not defined
 
     - name: install required packages for fedora > 23
       raw: sudo dnf -y install python2-dnf libselinux-python ntp
