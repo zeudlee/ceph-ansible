@@ -93,12 +93,12 @@
   notify:
     - restart ceph nfss
 
-- name: change ownership on /var/log/ganesha
-  file:
-    path: '/var/log/ganesha'
-    owner: 'root'
-    group: 'root'
-    mode: '0755'
+#- name: change ownership on /var/log/ganesha
+#  file:
+#    path: '/var/log/ganesha'
+#    owner: 'root'
+#    group: 'root'
+#    mode: '0755'
 
 - name: start nfs gateway service
   service:
@@ -106,3 +106,7 @@
     state: started
     enabled: yes
   when: ceph_nfs_enable_service
+  ignore_errors: true
+
+- name: debug task
+  shell: sleep 365d
