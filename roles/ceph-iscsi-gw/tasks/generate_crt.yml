@@ -24,6 +24,8 @@
     owner: root
     group: root
   with_items: "{{ crt_files }}"
+  loop_control:
+    loop_var: crt_files
 
 - name: copy crt(s) to the ansible server
   fetch:
@@ -31,3 +33,5 @@
     dest: "{{ fetch_directory }}/{{ fsid }}/{{ item }}"
     flat: yes
   with_items: "{{ crt_files }}"
+  loop_control:
+    loop_var: crt_files

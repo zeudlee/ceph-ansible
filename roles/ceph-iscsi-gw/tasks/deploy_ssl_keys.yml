@@ -30,7 +30,5 @@
 
 - name: include generate_crt.yml
   include: generate_crt.yml
-  with_together:
-    - "{{ crt_files }}"
-    - "{{ crt_files_exist.results }}"
-  when: item.1.stat.exists == false
+  with_items: "{{ crt_files_exist.results }}"
+  when: item.stat.exists == false
